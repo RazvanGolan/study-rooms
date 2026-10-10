@@ -9,6 +9,7 @@ public class Timetable
 {
     private readonly List<Room> _rooms = [];
     private readonly List<Booking> _bookings = [];
+    private readonly List<User> _users = [];
     private int _nextRoomId = 1;
     private int _nextBookingId = 1;
 
@@ -17,6 +18,29 @@ public class Timetable
         Room room = new Room(_nextRoomId++, name, building, capacity, equipment);
         _rooms.Add(room);
         return room;
+    }
+
+    public void AddUser(string id, string displayName, string email)
+    {
+        _users.Add(new User(id, displayName, email));
+    }
+
+    public User? FindUser(string id)
+    {
+        foreach (User user in _users)
+        {
+            if (user.Id == id)
+            {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    // For ids that must exist, such as the owner of a booking.
+    public User GetUser(string id)
+    {
+        return FindUser(id) ?? throw new InvalidOperationException($"User {id} does not exist.");
     }
 
     public List<Room> GetRooms()
@@ -34,6 +58,12 @@ public class Timetable
             }
         }
         return null;
+    }
+
+    // For ids that must exist, such as the room of a booking.
+    public Room GetRoom(int id)
+    {
+        return FindRoom(id) ?? throw new InvalidOperationException($"Room {id} does not exist.");
     }
 
     public Booking? FindBooking(int id)
@@ -92,5 +122,22 @@ public class Timetable
         _bookings.Add(booking);
         error = null;
         return true;
+    }
+
+    public bool TryJoin(Booking booking, string userId, DateTime now, [NotNullWhen(false)] out string? error)
+    {
+        // Joining must not put the student in two places at once either.
+        foreach (Booking other in _bookings)
+        {
+            if (other != booking && other.Status == BookingStatus.Active
+                && other.Overlaps(booking.Date, booking.Start, booking.End) && other.HasJoined(userId))
+            {
+                error = $"{userId} is already in booking {other.Id}, from {other.Start} to {other.End}.";
+                return false;
+            }
+        }
+
+        Room room = GetRoom(booking.RoomId);
+        return booking.TryJoin(userId, room.Capacity, now, out error);
     }
 }

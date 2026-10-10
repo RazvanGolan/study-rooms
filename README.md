@@ -39,14 +39,14 @@ You need the [.NET 10 SDK](https://dotnet.microsoft.com/download). From the repo
 dotnet run --project src/StudyRooms.Api
 ```
 
-The API listens on http://localhost:5080. Open http://localhost:5080/rooms in a browser to see the rooms. To send the other requests, open `src/StudyRooms.Api/StudyRooms.Api.http` in VS Code (with the REST Client extension) or Rider and click Send Request above each one. You can also use `curl`:
+The API listens on http://localhost:5080. Open http://localhost:5080/scalar in a browser to see every endpoint and try it out. You can also open `src/StudyRooms.Api/StudyRooms.Api.http` in VS Code (with the REST Client extension) or Rider and click Send Request above each request, or use `curl`:
 
 ```bash
 curl -X POST http://localhost:5080/bookings -H "Content-Type: application/json" \
-  -d '{"roomId":1,"date":"2026-10-20","start":"10:00","end":"12:00","userId":"ana","joinPolicy":"Open"}'
+  -d '{"roomId":1,"date":"2026-10-21","start":"10:00","end":"12:00","userId":"ana","joinPolicy":"Open"}'
 ```
 
-Everything is kept in memory for now, so stopping the API forgets every booking. The database comes in week 5.
+Bookings must start in the next 7 days, so change the date to one that fits. Everything is kept in memory for now, so stopping the API forgets every booking. The database comes in week 5.
 
 ## Using it for your project
 

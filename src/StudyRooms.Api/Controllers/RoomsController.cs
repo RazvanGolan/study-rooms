@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using StudyRooms.Api.Domain;
+using StudyRooms.Api.Models;
 
 namespace StudyRooms.Api.Controllers;
 
@@ -16,20 +17,25 @@ public class RoomsController : ControllerBase
 
     // GET /rooms
     [HttpGet]
-    public List<Room> GetAll()
+    public List<RoomResponse> GetAll()
     {
-        return _timetable.GetRooms();
+        List<RoomResponse> rooms = [];
+        foreach (Room room in _timetable.GetRooms())
+        {
+            rooms.Add(RoomResponse.From(room));
+        }
+        return rooms;
     }
 
     // GET /rooms/2
     [HttpGet("{id}")]
-    public ActionResult<Room> Get(int id)
+    public ActionResult<RoomResponse> Get(int id)
     {
         Room? room = _timetable.FindRoom(id);
         if (room is null)
         {
             return NotFound();
         }
-        return room;
+        return RoomResponse.From(room);
     }
 }

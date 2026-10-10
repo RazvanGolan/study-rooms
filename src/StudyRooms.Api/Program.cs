@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Scalar.AspNetCore;
 using StudyRooms.Api;
 using StudyRooms.Api.Domain;
 
@@ -8,20 +9,34 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-// One Timetable for the whole application. Every controller that asks for it gets the same object.
+// A description of every endpoint, in the OpenAPI format, for the Scalar page.
+builder.Services.AddOpenApi();
+
+// The "Booking" section of appsettings.json, read into a BookingOptions object.
+builder.Services.Configure<BookingOptions>(builder.Configuration.GetSection("Booking"));
+
+// One Timetable and one BookingRules for the whole application.
 builder.Services.AddSingleton<Timetable>();
+builder.Services.AddSingleton<BookingRules>();
 
 var app = builder.Build();
 
-AddSampleRooms(app.Services.GetRequiredService<Timetable>());
+AddSampleData(app.Services.GetRequiredService<Timetable>());
 
+app.MapOpenApi();               // the description, at /openapi/v1.json
+app.MapScalarApiReference();    // a page to read it and try every endpoint, at /scalar
 app.MapControllers();
 
 app.Run();
 
-static void AddSampleRooms(Timetable timetable)
+static void AddSampleData(Timetable timetable)
 {
-    timetable.AddRoom("A101", "Library", 4, Equipment.Whiteboard);
+    timetable.AddRoom("A101", "Library", 3, Equipment.Whiteboard);
     timetable.AddRoom("A102", "Library", 6, Equipment.Whiteboard | Equipment.PowerOutlets);
     timetable.AddRoom("B204", "Electrical Engineering", 10, Equipment.Projector | Equipment.Tv | Equipment.PowerOutlets);
+
+    timetable.AddUser("ana", "Ana P.", "ana.popescu@example.com");
+    timetable.AddUser("mihai", "Mihai I.", "mihai.ionescu@example.com");
+    timetable.AddUser("ioana", "Ioana D.", "ioana.dumitru@example.com");
+    timetable.AddUser("radu", "Radu S.", "radu.stan@example.com");
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using StudyRooms.Api.Domain;
+using StudyRooms.Api.Models;
 
 namespace StudyRooms.Api.Controllers;
 
@@ -16,8 +17,13 @@ public class TimetableController : ControllerBase
 
     // GET /timetable?date=2026-10-20
     [HttpGet]
-    public List<Booking> Get(DateOnly date)
+    public List<BookingResponse> Get(DateOnly date)
     {
-        return _timetable.GetBookings(date);
+        List<BookingResponse> bookings = [];
+        foreach (Booking booking in _timetable.GetBookings(date))
+        {
+            bookings.Add(BookingResponse.From(booking, _timetable));
+        }
+        return bookings;
     }
 }
