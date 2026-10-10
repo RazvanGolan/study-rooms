@@ -19,7 +19,7 @@ Content-Type: application/json
   "joinPolicy": "Open"
 }
 
-### Mihai wants A101 from 11:00 to 13:00: it overlaps Ana's booking (409 Conflict, R5)
+### Mihai wants A101 from 11:00 to 13:00: it overlaps Ana's booking (409 Conflict)
 POST {{host}}/bookings
 Content-Type: application/json
 
@@ -45,7 +45,7 @@ Content-Type: application/json
   "joinPolicy": "Private"
 }
 
-### Ana tries A102 at 11:00, while she is in A101 (409 Conflict, R13)
+### Ana tries A102 at 11:00, while she is in A101 (409 Conflict)
 POST {{host}}/bookings
 Content-Type: application/json
 

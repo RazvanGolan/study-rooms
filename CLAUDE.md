@@ -2,7 +2,7 @@
 
 This repository holds the study room booking application that the class builds in the optional part of the CFLP C# lab at the Politehnica University of Timișoara. The slides for each session live in a separate repository, `RazvanGolan/cflp-lab`, published at https://razvangolan.github.io/cflp-lab/. Those decks link here by tag.
 
-`REQUIREMENTS.md` is the specification. Its rules are numbered (R1 to R19) and code comments, commits and slides refer to them by number. When a rule changes in class, update that file in the same commit as the code.
+`REQUIREMENTS.md` is the specification. Its rules are numbered (R1 to R19); slides and commit messages may refer to them by number, but the code never does. Comments describe the rule in words. When a rule changes in class, update that file in the same commit as the code.
 
 ## Tags
 
@@ -15,7 +15,9 @@ git tag week-03 && git push origin week-03
 ## Code
 
 - Target `net10.0` with nullable reference types on.
-- Unlike the demo code in `cflp-lab`, this application uses NuGet packages (EF Core, Identity, Aspire). Everything up to week 9 must still run on a Linux lab machine with only the .NET SDK and NuGet: SQLite, no Docker, no other database. Containers (Mailpit) are allowed only in the Aspire AppHost and must be optional.
+- The API uses controllers (`[ApiController]` classes in `Controllers/`), not minimal APIs. Dependencies arrive through the controller's constructor.
+- Use only what students have seen in the lab or in an earlier optional session. Anything new (a `lock`, an attribute, a pattern) is either explained on a slide that week or left out.
+- Students run this application on their own computers, not on the lab machines, so NuGet packages (OpenAPI, EF Core, Identity, Aspire) are fine. Keep it runnable with the .NET SDK alone: SQLite, no Docker, no other database. Containers (Mailpit) are allowed only in the Aspire AppHost and must be optional.
 - Write the code the way it is shown in class: plain, with few abstractions, no `#region` markers. A student who missed a week should be able to read the diff between two tags.
 - Never put a solution to a graded assignment or a test here. Those are shared with other lab groups and reused from year to year.
 
