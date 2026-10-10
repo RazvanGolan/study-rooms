@@ -1,0 +1,21 @@
+# .NET build output
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# IDEs
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# SQLite databases created when the app runs
+*.db
+*.db-shm
+*.db-wal
+
+# Live-coding area used during the lab (never committed)
+scratch/
+
+.DS_Store
