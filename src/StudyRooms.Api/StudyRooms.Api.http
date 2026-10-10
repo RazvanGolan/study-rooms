@@ -1,0 +1,78 @@
+# Send these one at a time, from top to bottom, while the API runs (dotnet run).
+
+@host = http://localhost:5080
+@date = 2026-10-20
+
+### All rooms
+GET {{host}}/rooms
+
+### Ana books A101 from 10:00 to 12:00 (201 Created)
+POST {{host}}/bookings
+Content-Type: application/json
+
+{
+  "roomId": 1,
+  "date": "{{date}}",
+  "start": "10:00",
+  "end": "12:00",
+  "userId": "ana",
+  "joinPolicy": "Open"
+}
+
+### Mihai wants A101 from 11:00 to 13:00: it overlaps Ana's booking (409 Conflict, R5)
+POST {{host}}/bookings
+Content-Type: application/json
+
+{
+  "roomId": 1,
+  "date": "{{date}}",
+  "start": "11:00",
+  "end": "13:00",
+  "userId": "mihai",
+  "joinPolicy": "Private"
+}
+
+### Mihai takes A101 from 12:00 to 13:00: it only touches Ana's booking (201 Created)
+POST {{host}}/bookings
+Content-Type: application/json
+
+{
+  "roomId": 1,
+  "date": "{{date}}",
+  "start": "12:00",
+  "end": "13:00",
+  "userId": "mihai",
+  "joinPolicy": "Private"
+}
+
+### Ana tries A102 at 11:00, while she is in A101 (409 Conflict, R13)
+POST {{host}}/bookings
+Content-Type: application/json
+
+{
+  "roomId": 2,
+  "date": "{{date}}",
+  "start": "11:00",
+  "end": "12:00",
+  "userId": "ana",
+  "joinPolicy": "Open"
+}
+
+### A room that does not exist (404 Not Found)
+POST {{host}}/bookings
+Content-Type: application/json
+
+{
+  "roomId": 99,
+  "date": "{{date}}",
+  "start": "10:00",
+  "end": "11:00",
+  "userId": "ana",
+  "joinPolicy": "Open"
+}
+
+### The day's bookings
+GET {{host}}/timetable?date={{date}}
+
+### One booking
+GET {{host}}/bookings/1

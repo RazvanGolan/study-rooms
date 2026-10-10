@@ -33,7 +33,20 @@ There is no optional part in week 8 or week 12, when the tests take place. The p
 
 ## Running it
 
-You need the [.NET 10 SDK](https://dotnet.microsoft.com/download). The first code arrives in week 3, and this section will say how to start it.
+You need the [.NET 10 SDK](https://dotnet.microsoft.com/download). From the repository folder:
+
+```bash
+dotnet run --project src/StudyRooms.Api
+```
+
+The API listens on http://localhost:5080. Open http://localhost:5080/rooms in a browser to see the rooms. To send the other requests, open `src/StudyRooms.Api/StudyRooms.Api.http` in VS Code (with the REST Client extension) or Rider and click Send Request above each one. You can also use `curl`:
+
+```bash
+curl -X POST http://localhost:5080/bookings -H "Content-Type: application/json" \
+  -d '{"roomId":1,"date":"2026-10-20","start":"10:00","end":"12:00","userId":"ana","joinPolicy":"Open"}'
+```
+
+Everything is kept in memory for now, so stopping the API forgets every booking. The database comes in week 5.
 
 ## Using it for your project
 
