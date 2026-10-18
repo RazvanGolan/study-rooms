@@ -72,8 +72,9 @@ public class BookingService
             .ToList();
     }
 
-    public bool TryBook(Room room, AppUser owner, DateOnly date, TimeOnly start, TimeOnly end, JoinPolicy joinPolicy,
-        [NotNullWhen(true)] out Booking? booking, [NotNullWhen(false)] out string? error)
+    // bookedById is whoever sent the request: the owner, or an admin booking for a student.
+    public bool TryBook(Room room, AppUser owner, string bookedById, DateOnly date, TimeOnly start, TimeOnly end,
+        JoinPolicy joinPolicy, [NotNullWhen(true)] out Booking? booking, [NotNullWhen(false)] out string? error)
     {
         // The check and the insert happen in one transaction. Until it ends, no other request can write,
         // so nobody can book the room between our check and our insert.
@@ -85,20 +86,22 @@ public class BookingService
             if (other.RoomId == room.Id)
             {
                 booking = null;
-                error = $"The room is taken from {other.Start} to {other.End} (booking {other.Id}).";
-                return false;
-            }
-
-            // The student is already in another booking at this time, in any room.
-            if (other.HasJoined(owner.Id))
-            {
-                booking = null;
-                error = $"{owner.DisplayName} is already in booking {other.Id}, from {other.Start} to {other.End}.";
+                error = $"{room.Name} is taken from {other.Start} to {other.End}.";
                 return false;
             }
         }
 
+        // The student is already in another booking at this time, in any room.
+        if (!IsFreeAt(owner.Id, Who(owner, bookedById), date, start, end, 0, out error))
+        {
+            booking = null;
+            return false;
+        }
+
         WaitForDemo();
+
+        // The student will be busy at this time, so they no longer need their requests to join other bookings then.
+        WithdrawRequestsAt(owner.Id, date, start, end, 0);
 
         booking = new Booking(room, owner, date, start, end, joinPolicy);
         _db.Bookings.Add(booking);
@@ -119,7 +122,7 @@ public class BookingService
             if (other.RoomId == room.Id)
             {
                 booking = null;
-                error = $"The room is taken from {other.Start} to {other.End} (booking {other.Id}). Cancel that booking first.";
+                error = $"{room.Name} is taken from {other.Start} to {other.End}. Cancel that booking first.";
                 return false;
             }
         }
@@ -147,7 +150,7 @@ public class BookingService
         }
 
         // Joining must not put the student in two places at once either.
-        if (!IsFreeAt(user.Id, booking, out error))
+        if (!IsFreeAt(user.Id, "You are", booking.Date, booking.Start, booking.End, booking.Id, out error))
         {
             return false;
         }
@@ -158,6 +161,13 @@ public class BookingService
         }
 
         WaitForDemo();
+
+        // Joining an open booking puts the student in it now, so their other requests for this time go.
+        // Asking to join an "on request" booking does not: a pending request does not count yet.
+        if (booking.HasJoined(user.Id))
+        {
+            WithdrawRequestsAt(user.Id, booking.Date, booking.Start, booking.End, booking.Id);
+        }
 
         if (booking.IsFull())
         {
@@ -190,7 +200,13 @@ public class BookingService
         }
 
         // Pending requests do not count as being somewhere, so the student may be busy by now.
-        if (!IsFreeAt(requesterId, booking, out error))
+        string who = "The student is";
+        Participant? requester = booking.FindParticipant(requesterId);
+        if (requester is not null)
+        {
+            who = $"{requester.User.DisplayName} is";
+        }
+        if (!IsFreeAt(requesterId, who, booking.Date, booking.Start, booking.End, booking.Id, out error))
         {
             return false;
         }
@@ -289,24 +305,53 @@ public class BookingService
     private List<Booking> FindOverlapping(DateOnly date, TimeOnly start, TimeOnly end)
     {
         return _db.Bookings
+            .Include(b => b.Room)
             .Include(b => b.Participants)
             .Where(b => b.Date == date && b.Status == BookingStatus.Active && b.Start < end && start < b.End)
             .ToList();
     }
 
-    // A student cannot be in two places at once: no other active booking they are in may overlap this one.
-    private bool IsFreeAt(string userId, Booking booking, [NotNullWhen(false)] out string? error)
+    // A student cannot be in two places at once: no other active booking they are in may overlap these times.
+    // exceptBookingId is the booking being joined, or 0 for a new one. who starts the message: "You are",
+    // or "Ana P. is" when someone else acts for the student.
+    private bool IsFreeAt(string userId, string who, DateOnly date, TimeOnly start, TimeOnly end, int exceptBookingId,
+        [NotNullWhen(false)] out string? error)
     {
-        foreach (Booking other in FindOverlapping(booking.Date, booking.Start, booking.End))
+        foreach (Booking other in FindOverlapping(date, start, end))
         {
-            if (other.Id != booking.Id && other.HasJoined(userId))
+            if (other.Id != exceptBookingId && other.HasJoined(userId))
             {
-                error = $"The student is already in booking {other.Id}, from {other.Start} to {other.End}.";
+                error = $"{who} already in a booking in {other.Room.Name} from {other.Start} to {other.End}.";
                 return false;
             }
         }
         error = null;
         return true;
+    }
+
+    // Messages speak to the student when they asked for themselves, and name them when an admin did.
+    private static string Who(AppUser student, string askedById)
+    {
+        if (student.Id == askedById)
+        {
+            return "You are";
+        }
+        return $"{student.DisplayName} is";
+    }
+
+    // Takes back the student's requests to join other bookings at these times. They become "left",
+    // like someone who left a booking, so the student can ask again if their plans change.
+    private void WithdrawRequestsAt(string userId, DateOnly date, TimeOnly start, TimeOnly end, int exceptBookingId)
+    {
+        foreach (Booking other in FindOverlapping(date, start, end))
+        {
+            if (other.Id != exceptBookingId && other.HasRequested(userId))
+            {
+                other.FindParticipant(userId)!.MarkLeft();
+                _logger.LogInformation("Request of {UserId} to join booking {BookingId} withdrawn, they are busy at that time; notify the owner",
+                    userId, other.Id);
+            }
+        }
     }
 
     private void DeclinePendingRequests(Booking booking)

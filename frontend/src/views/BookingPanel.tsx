@@ -79,7 +79,11 @@ export function BookingPanel({
     status = { title: 'You asked to join', text: `${booking.owner} has not answered yet.` }
   else if (booking.myStatus === 'Declined') status = { title: 'Your request was declined', text: '' }
   else if (booking.myStatus === 'Removed') status = { title: 'The owner removed you', text: '' }
-  else if (booking.myStatus === 'Left') status = { title: 'You left this booking', text: '' }
+  else if (booking.myStatus === 'Left')
+    status = {
+      title: 'You are not in this booking',
+      text: 'You left it, or your request was taken back when you booked something else at this time.',
+    }
 
   const canJoin =
     !isBlock &&

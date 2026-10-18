@@ -27,7 +27,7 @@ There are two roles. A student books rooms and joins bookings. An admin manages 
 
 ## Limits
 
-- R13. A student cannot be in two places at once: the active bookings they own or joined never overlap. Bookings at different times are fine. Pending requests do not count, but the owner cannot approve a request from a student who is busy at that time, and approving a request declines the student's other pending requests that overlap with it.
+- R13. A student cannot be in two places at once: the active bookings they own or joined never overlap. Bookings at different times are fine. Pending requests do not count, but the owner cannot approve a request from a student who is busy at that time, and approving a request declines the student's other pending requests that overlap with it. When a student books a room or joins an open booking, their own pending requests that overlap with it are withdrawn, and they can ask again later.
 - R14. The owner can cancel a booking until 2 hours before it starts (this also comes from configuration). After that, only an admin can cancel it.
 
 ## Notifications

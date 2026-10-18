@@ -55,7 +55,7 @@ public class BookingsController : AppControllerBase
         }
 
         AppUser owner = _accountService.FindUser(CurrentUserId)!;
-        if (!_bookingService.TryBook(room, owner, request.Date, request.Start, request.End, request.JoinPolicy,
+        if (!_bookingService.TryBook(room, owner, CurrentUserId, request.Date, request.Start, request.End, request.JoinPolicy,
                 out Booking? booking, out string? error))
         {
             _logger.LogInformation("Booking refused for {UserId}: {Reason}", owner.Id, error);

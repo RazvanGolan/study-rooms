@@ -59,7 +59,7 @@ public class AdminBookingsController : AppControllerBase
             return BadRequest(new ErrorResponse("The booking is not valid.", problems));
         }
 
-        if (!_bookingService.TryBook(room, student, request.Date, request.Start, request.End, request.JoinPolicy,
+        if (!_bookingService.TryBook(room, student, CurrentUserId, request.Date, request.Start, request.End, request.JoinPolicy,
                 out Booking? booking, out string? error))
         {
             return Conflict(new ErrorResponse("The booking was refused.", [error]));

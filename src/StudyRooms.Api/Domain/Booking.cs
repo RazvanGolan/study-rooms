@@ -125,7 +125,7 @@ public class Booking
         }
         if (JoinPolicy == JoinPolicy.Private)
         {
-            error = "This booking is private.";
+            error = "This booking is private, so nobody else can join.";
             return false;
         }
 
@@ -279,7 +279,7 @@ public class Booking
         }
         if (now > StartsAt - cutoff)
         {
-            error = $"A booking can be cancelled until {cutoff.TotalHours} hours before it starts.";
+            error = $"A booking can be cancelled until {cutoff.TotalHours} hours before it starts. Ask an admin to cancel it now.";
             return false;
         }
 
