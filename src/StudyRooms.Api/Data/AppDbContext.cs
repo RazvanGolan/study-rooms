@@ -14,5 +14,5 @@ public class AppDbContext : DbContext
     public DbSet<Room> Rooms => Set<Room>();
     public DbSet<Booking> Bookings => Set<Booking>();
     public DbSet<Participant> Participants => Set<Participant>();
-    public DbSet<User> Users => Set<User>();
+    public DbSet<AppUser> Users => Set<AppUser>();
 }

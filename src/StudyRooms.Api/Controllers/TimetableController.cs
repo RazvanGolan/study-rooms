@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StudyRooms.Api.Domain;
 using StudyRooms.Api.Models;
@@ -7,7 +8,8 @@ namespace StudyRooms.Api.Controllers;
 
 [ApiController]
 [Route("timetable")]
-public class TimetableController : ControllerBase
+[Authorize]
+public class TimetableController : AppControllerBase
 {
     private readonly BookingService _bookingService;
 
@@ -23,7 +25,7 @@ public class TimetableController : ControllerBase
         List<BookingResponse> bookings = [];
         foreach (Booking booking in _bookingService.GetBookings(date))
         {
-            bookings.Add(BookingResponse.From(booking, _bookingService));
+            bookings.Add(BookingResponse.From(booking, CurrentUserId));
         }
         return bookings;
     }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StudyRooms.Api.Domain;
 using StudyRooms.Api.Models;
@@ -7,6 +8,7 @@ namespace StudyRooms.Api.Controllers;
 
 [ApiController]
 [Route("rooms")]
+[Authorize]
 public class RoomsController : ControllerBase
 {
     private readonly RoomService _roomService;

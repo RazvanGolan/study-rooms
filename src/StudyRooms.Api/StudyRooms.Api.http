@@ -1,34 +1,76 @@
 # Send these one at a time, from top to bottom, while the API runs (dotnet run).
-# Bookings must be within the next 7 days, so set @date to tomorrow first.
-# You can also try every request from the browser at http://localhost:5080/scalar.
-# The database keeps everything between runs. The ids below (bookings/1, 2, 3) are right for a new
-# database, so to start over, stop the API and delete study-rooms.db.
+#
+# Before you start:
+# 1. Set @date to tomorrow, and @later to 9 days after @date.
+# 2. Send the four logins below. From each answer, copy the "accessToken" and paste it after the
+#    matching @ana, @mihai, @radu or @admin line. Tokens last one hour.
+#
+# The sample accounts all have the password Password1! and the ids ana, mihai, ioana, radu and admin.
+# You can also try every request at http://localhost:5080/scalar: paste a token in the Bearer field.
+# The database keeps everything between runs. The booking ids below are right for a new database,
+# so to start over, stop the API and delete study-rooms.db.
 
 @host = http://localhost:5080
-@date = 2026-10-21
+@date = 2026-10-27
+@later = 2026-11-05
 
-### All rooms
+@ana = paste-the-token-here
+@mihai = paste-the-token-here
+@radu = paste-the-token-here
+@admin = paste-the-token-here
+
+### Without a token: 401 Unauthorized
 GET {{host}}/rooms
 
-### Rooms with a whiteboard and power outlets (only A102)
-GET {{host}}/rooms?equipment=Whiteboard,PowerOutlets
-
-### Everything wrong at once: 10:10 is not on the 30 minute step, it lasts too long,
-### it ends after closing time, and there is no user zoe (400 with every problem listed)
-POST {{host}}/bookings
+### Log in as Ana (200 with an accessToken and a refreshToken)
+POST {{host}}/account/login
 Content-Type: application/json
 
-{
-  "roomId": 1,
-  "date": "{{date}}",
-  "start": "10:10",
-  "end": "23:00",
-  "userId": "zoe",
-  "joinPolicy": "Open"
-}
+{ "email": "ana.popescu@example.com", "password": "Password1!" }
 
-### Ana books A101 (capacity 3) from 10:00 to 12:00, and anyone may join (201 Created)
+### Log in as Mihai
+POST {{host}}/account/login
+Content-Type: application/json
+
+{ "email": "mihai.ionescu@example.com", "password": "Password1!" }
+
+### Log in as Radu
+POST {{host}}/account/login
+Content-Type: application/json
+
+{ "email": "radu.stan@example.com", "password": "Password1!" }
+
+### Log in as the admin
+POST {{host}}/account/login
+Content-Type: application/json
+
+{ "email": "admin@example.com", "password": "Password1!" }
+
+### A wrong password (401)
+POST {{host}}/account/login
+Content-Type: application/json
+
+{ "email": "ana.popescu@example.com", "password": "password" }
+
+### Sign up with a password that is too short (400)
+POST {{host}}/account/register
+Content-Type: application/json
+
+{ "email": "zoe@example.com", "password": "zoe", "displayName": "Zoe T." }
+
+### Sign up (201). A second time gives 400: the email is taken.
+POST {{host}}/account/register
+Content-Type: application/json
+
+{ "email": "zoe@example.com", "password": "Password1!", "displayName": "Zoe T." }
+
+### Who am I?
+GET {{host}}/me
+Authorization: Bearer {{ana}}
+
+### Ana books A101 (capacity 3) from 10:00 to 12:00. People can ask to join, and she approves them (201)
 POST {{host}}/bookings
+Authorization: Bearer {{ana}}
 Content-Type: application/json
 
 {
@@ -36,111 +78,145 @@ Content-Type: application/json
   "date": "{{date}}",
   "start": "10:00",
   "end": "12:00",
-  "userId": "ana",
-  "joinPolicy": "Open"
+  "joinPolicy": "OnRequest"
 }
 
-### Mihai joins (200, one place left)
+### Mihai asks to join (200, "myStatus": "Requested")
 POST {{host}}/bookings/1/join
-Content-Type: application/json
+Authorization: Bearer {{mihai}}
 
-{ "userId": "mihai" }
-
-### Ioana joins (200, the booking is full now)
+### Radu asks to join too
 POST {{host}}/bookings/1/join
-Content-Type: application/json
+Authorization: Bearer {{radu}}
 
-{ "userId": "ioana" }
+### Ana, the owner, sees both requests
+GET {{host}}/bookings/1
+Authorization: Bearer {{ana}}
 
-### Radu tries to join (409, the booking is full)
-POST {{host}}/bookings/1/join
-Content-Type: application/json
+### Mihai sees the booking, but not who else is waiting
+GET {{host}}/bookings/1
+Authorization: Bearer {{mihai}}
 
-{ "userId": "radu" }
+### Radu tries to approve Mihai, but only the owner can (403 Forbidden)
+POST {{host}}/bookings/1/participants/mihai/approve
+Authorization: Bearer {{radu}}
 
-### What other students see: display names, no ids or emails
-GET {{host}}/timetable?date={{date}}
+### Ana approves Mihai (200, one place left)
+POST {{host}}/bookings/1/participants/mihai/approve
+Authorization: Bearer {{ana}}
 
-### Ioana leaves (200, a place is free again)
-POST {{host}}/bookings/1/leave
-Content-Type: application/json
-
-{ "userId": "ioana" }
-
-### Ana cannot leave her own booking (409)
-POST {{host}}/bookings/1/leave
-Content-Type: application/json
-
-{ "userId": "ana" }
-
-### Radu tries to remove Mihai, but only the owner can (403 Forbidden)
-POST {{host}}/bookings/1/participants/mihai/remove
-Content-Type: application/json
-
-{ "userId": "radu" }
-
-### Ana removes Mihai (200)
-POST {{host}}/bookings/1/participants/mihai/remove
-Content-Type: application/json
-
-{ "userId": "ana" }
-
-### Mihai cannot join again after being removed (409)
-POST {{host}}/bookings/1/join
-Content-Type: application/json
-
-{ "userId": "mihai" }
-
-### Radu makes a private booking in B204 (201)
+### Meanwhile Radu books B204 from 10:00 to 11:00 (201)
 POST {{host}}/bookings
+Authorization: Bearer {{radu}}
 Content-Type: application/json
 
 {
   "roomId": 3,
   "date": "{{date}}",
-  "start": "14:00",
-  "end": "15:00",
-  "userId": "radu",
-  "joinPolicy": "Private"
+  "start": "10:00",
+  "end": "11:00",
+  "joinPolicy": "Open"
 }
 
-### Nobody can join a private booking (409)
-POST {{host}}/bookings/2/join
+### Ana approves Radu (409: he is in his own booking at that time now)
+POST {{host}}/bookings/1/participants/radu/approve
+Authorization: Bearer {{ana}}
+
+### So Ana declines him (200)
+POST {{host}}/bookings/1/participants/radu/decline
+Authorization: Bearer {{ana}}
+
+### Mihai's bookings: the ones he is in or has asked to join
+GET {{host}}/me/bookings
+Authorization: Bearer {{mihai}}
+
+### Ana removes Mihai (200)
+POST {{host}}/bookings/1/participants/mihai/remove
+Authorization: Bearer {{ana}}
+
+### A student calls an admin endpoint (403 Forbidden: logged in, but not an admin)
+POST {{host}}/admin/rooms
+Authorization: Bearer {{ana}}
 Content-Type: application/json
 
-{ "userId": "ana" }
+{ "name": "C305", "building": "Library", "capacity": 4, "equipment": "Tv" }
 
-### Ana cancels her booking (200, the status is Cancelled)
-POST {{host}}/bookings/1/cancel
+### The admin adds the room (201)
+POST {{host}}/admin/rooms
+Authorization: Bearer {{admin}}
 Content-Type: application/json
 
-{ "userId": "ana" }
+{ "name": "C305", "building": "Library", "capacity": 4, "equipment": "Tv" }
 
-### To see the 2 hour limit on cancelling: book a room for today, starting less than
-### 2 hours from now (change the date and the times below), then cancel it (409)
-POST {{host}}/bookings
+### Renaming A102 to A101 (409: the unique index on the name refuses it)
+PUT {{host}}/admin/rooms/2
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "name": "A101", "building": "Library", "capacity": 6, "equipment": "Whiteboard, PowerOutlets" }
+
+### A class takes A102 from 14:00 to 16:00: a block, with no owner (201)
+POST {{host}}/admin/bookings/blocks
+Authorization: Bearer {{admin}}
 Content-Type: application/json
 
 {
   "roomId": 2,
-  "date": "2026-10-20",
-  "start": "12:00",
-  "end": "12:30",
-  "userId": "ioana",
+  "date": "{{date}}",
+  "start": "14:00",
+  "end": "16:00",
+  "note": "Class: PCLP"
+}
+
+### Nobody can join a block (409)
+POST {{host}}/bookings/3/join
+Authorization: Bearer {{ana}}
+
+### The admin books A102 for Mihai, more than 7 days ahead (201; a student would get 400)
+POST {{host}}/admin/bookings
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{
+  "roomId": 2,
+  "date": "{{later}}",
+  "start": "10:00",
+  "end": "11:00",
+  "studentEmail": "mihai.ionescu@example.com",
   "joinPolicy": "Open"
 }
 
-### Cancel the booking above (use the id it came back with)
-POST {{host}}/bookings/3/cancel
+### What students see: display names, the block with its note
+GET {{host}}/timetable?date={{date}}
+Authorization: Bearer {{mihai}}
+
+### What the admin sees: every booking, cancelled ones too, with emails and every participant's status
+GET {{host}}/admin/bookings?date={{date}}
+Authorization: Bearer {{admin}}
+
+### The admin cancels Radu's booking (200, the reason is ByAdmin)
+POST {{host}}/admin/bookings/2/cancel
+Authorization: Bearer {{admin}}
+
+### The admin removes A101 (204). The room is hidden, and Ana's booking is cancelled.
+DELETE {{host}}/admin/rooms/1
+Authorization: Bearer {{admin}}
+
+### Ana's booking: cancelled, the reason is RoomRemoved
+GET {{host}}/bookings/1
+Authorization: Bearer {{ana}}
+
+### A new access token, without the password. Paste the refreshToken from a login answer.
+POST {{host}}/account/refresh
 Content-Type: application/json
 
-{ "userId": "ioana" }
+{ "refreshToken": "paste-the-refresh-token-here" }
 
-### Two requests at once. Set "DemoDelaySeconds": 3 in appsettings.json and restart the API.
+### Two requests at once (from week 5). Set "DemoDelaySeconds": 3 in appsettings.json and restart.
 ### Then send this request and the next one within 3 seconds of each other.
-### With the transaction, Ioana gets 201 and Radu waits, then gets 409.
-### Without it, both get 201 and B204 is booked twice from 17:00 to 18:00.
+### With the transaction, Ana gets 201 and Radu waits, then gets 409.
 POST {{host}}/bookings
+Authorization: Bearer {{ana}}
 Content-Type: application/json
 
 {
@@ -148,12 +224,12 @@ Content-Type: application/json
   "date": "{{date}}",
   "start": "16:00",
   "end": "18:00",
-  "userId": "ioana",
   "joinPolicy": "Open"
 }
 
 ### The second one, overlapping the first
 POST {{host}}/bookings
+Authorization: Bearer {{radu}}
 Content-Type: application/json
 
 {
@@ -161,6 +237,5 @@ Content-Type: application/json
   "date": "{{date}}",
   "start": "17:00",
   "end": "19:00",
-  "userId": "radu",
   "joinPolicy": "Open"
 }

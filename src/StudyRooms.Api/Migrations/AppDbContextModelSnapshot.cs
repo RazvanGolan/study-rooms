@@ -17,6 +17,34 @@ namespace StudyRooms.Api.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.13");
 
+            modelBuilder.Entity("StudyRooms.Api.Domain.AppUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("StudyRooms.Api.Domain.Booking", b =>
                 {
                     b.Property<int>("Id")
@@ -32,8 +60,10 @@ namespace StudyRooms.Api.Migrations
                     b.Property<int>("JoinPolicy")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Note")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("OwnerId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("Reason")
@@ -49,6 +79,10 @@ namespace StudyRooms.Api.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
+
+                    b.HasIndex("RoomId");
 
                     b.ToTable("Bookings");
                 });
@@ -68,6 +102,8 @@ namespace StudyRooms.Api.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("BookingId", "UserId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Participants");
                 });
@@ -103,22 +139,21 @@ namespace StudyRooms.Api.Migrations
                     b.ToTable("Rooms");
                 });
 
-            modelBuilder.Entity("StudyRooms.Api.Domain.User", b =>
+            modelBuilder.Entity("StudyRooms.Api.Domain.Booking", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
+                    b.HasOne("StudyRooms.Api.Domain.AppUser", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId");
 
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.HasOne("StudyRooms.Api.Domain.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Navigation("Owner");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("Users");
+                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("StudyRooms.Api.Domain.Participant", b =>
@@ -128,6 +163,14 @@ namespace StudyRooms.Api.Migrations
                         .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("StudyRooms.Api.Domain.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("StudyRooms.Api.Domain.Booking", b =>

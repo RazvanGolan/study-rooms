@@ -1,9 +1,10 @@
 using StudyRooms.Api.Domain;
-using StudyRooms.Api.Services;
 
 namespace StudyRooms.Api.Models;
 
-// What other students see about a booking: names, but no ids or emails.
+// What a student sees about a booking: names, but no emails.
+// Requests holds the people waiting for approval, and only the owner sees them.
+// MyStatus says where the student asking stands: Joined, Requested, ..., or null if not in it.
 public record BookingResponse(
     int Id,
     int RoomId,
@@ -11,38 +12,55 @@ public record BookingResponse(
     DateOnly Date,
     TimeOnly Start,
     TimeOnly End,
-    string Owner,
-    List<string> People,
+    string? Owner,
+    string? Note,
+    List<PersonResponse> People,
+    List<PersonResponse> Requests,
     int PlacesLeft,
     JoinPolicy JoinPolicy,
     BookingStatus Status,
-    CancelReason? Reason)
+    CancelReason? Reason,
+    ParticipantStatus? MyStatus)
 {
-    public static BookingResponse From(Booking booking, BookingService bookingService)
+    // The booking must come with its room, owner and participants loaded (BookingService does that).
+    public static BookingResponse From(Booking booking, string userId)
     {
-        Room room = bookingService.GetRoom(booking.RoomId);
-
-        List<string> people = [];
+        List<PersonResponse> people = [];
+        List<PersonResponse> requests = [];
         foreach (Participant participant in booking.Participants)
         {
+            PersonResponse person = new PersonResponse(participant.UserId, participant.User.DisplayName);
             if (participant.Status == ParticipantStatus.Joined)
             {
-                people.Add(bookingService.GetUser(participant.UserId).DisplayName);
+                people.Add(person);
             }
+            else if (participant.Status == ParticipantStatus.Requested && userId == booking.OwnerId)
+            {
+                requests.Add(person);
+            }
+        }
+
+        int placesLeft = 0;
+        if (!booking.IsBlock)
+        {
+            placesLeft = Math.Max(0, booking.Room.Capacity - people.Count);
         }
 
         return new BookingResponse(
             booking.Id,
-            room.Id,
-            room.Name,
+            booking.RoomId,
+            booking.Room.Name,
             booking.Date,
             booking.Start,
             booking.End,
-            bookingService.GetUser(booking.OwnerId).DisplayName,
+            booking.Owner?.DisplayName,
+            booking.Note,
             people,
-            Math.Max(0, room.Capacity - people.Count),
+            requests,
+            placesLeft,
             booking.JoinPolicy,
             booking.Status,
-            booking.Reason);
+            booking.Reason,
+            booking.FindParticipant(userId)?.Status);
     }
 }

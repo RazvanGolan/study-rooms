@@ -15,14 +15,35 @@ public class Room
 
     public Room(string name, string building, int capacity, Equipment equipment)
     {
-        if (capacity < 1)
-        {
-            throw new ArgumentException("Capacity must be at least 1.", nameof(capacity));
-        }
-
+        CheckCapacity(capacity);
         Name = name;
         Building = building;
         Capacity = capacity;
         Equipment = equipment;
+    }
+
+    // An admin may lower the capacity below the size of a booking. That booking keeps its people,
+    // but nobody new can join it until it fits again.
+    public void Edit(string name, string building, int capacity, Equipment equipment)
+    {
+        CheckCapacity(capacity);
+        Name = name;
+        Building = building;
+        Capacity = capacity;
+        Equipment = equipment;
+    }
+
+    // A removed room is hidden, not deleted, so past bookings can still show it.
+    public void Remove()
+    {
+        IsActive = false;
+    }
+
+    private static void CheckCapacity(int capacity)
+    {
+        if (capacity < 1)
+        {
+            throw new ArgumentException("Capacity must be at least 1.", nameof(capacity));
+        }
     }
 }

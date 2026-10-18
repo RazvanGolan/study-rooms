@@ -22,7 +22,19 @@ public class BookingRules
         return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, _timeZone);
     }
 
+    // Every rule about the times, for a booking made by a student.
     public List<string> CheckTimes(DateOnly date, TimeOnly start, TimeOnly end)
+    {
+        List<string> problems = CheckTimesForAdmin(date, start, end);
+        if (date > DateOnly.FromDateTime(Now()).AddDays(_options.DaysAhead))
+        {
+            problems.Add($"Rooms can be booked at most {_options.DaysAhead} days ahead.");
+        }
+        return problems;
+    }
+
+    // An admin can book further ahead than students. The other rules are the same.
+    public List<string> CheckTimesForAdmin(DateOnly date, TimeOnly start, TimeOnly end)
     {
         List<string> problems = [];
 
@@ -48,14 +60,9 @@ public class BookingRules
             problems.Add($"Rooms can be booked between {_options.Opens} and {_options.Closes}.");
         }
 
-        DateTime now = Now();
-        if (date.ToDateTime(start) <= now)
+        if (date.ToDateTime(start) <= Now())
         {
             problems.Add("A booking cannot start in the past.");
-        }
-        if (date > DateOnly.FromDateTime(now).AddDays(_options.DaysAhead))
-        {
-            problems.Add($"Rooms can be booked at most {_options.DaysAhead} days ahead.");
         }
 
         return problems;

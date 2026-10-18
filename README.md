@@ -39,14 +39,40 @@ You need the [.NET 10 SDK](https://dotnet.microsoft.com/download). From the repo
 dotnet run --project src/StudyRooms.Api
 ```
 
-The API listens on http://localhost:5080. Open http://localhost:5080/scalar in a browser to see every endpoint and try it out. You can also open `src/StudyRooms.Api/StudyRooms.Api.http` in VS Code (with the REST Client extension) or Rider and click Send Request above each request, or use `curl`:
+The API listens on http://localhost:5080. Open http://localhost:5080/scalar in a browser to see every endpoint and try it out. You can also open `src/StudyRooms.Api/StudyRooms.Api.http` in VS Code (with the REST Client extension) or Rider and click Send Request above each request.
+
+The data lives in a SQLite database, the file `src/StudyRooms.Api/study-rooms.db`. The API creates it on the first run and fills in three sample rooms and these accounts, all with the password `Password1!`:
+
+| Email | Role |
+|---|---|
+| admin@example.com | admin |
+| ana.popescu@example.com | student |
+| mihai.ionescu@example.com | student |
+| ioana.dumitru@example.com | student |
+| radu.stan@example.com | student |
+
+It keeps your bookings when you stop and start the API again. To start over, stop the API and delete the file.
+
+## Logging in
+
+Every request needs a token, except signing up and logging in. Log in first:
+
+```bash
+curl -X POST http://localhost:5080/account/login -H "Content-Type: application/json" \
+  -d '{"email":"ana.popescu@example.com","password":"Password1!"}'
+```
+
+The answer has an `accessToken`. Send it with each request in the `Authorization` header:
 
 ```bash
 curl -X POST http://localhost:5080/bookings -H "Content-Type: application/json" \
-  -d '{"roomId":1,"date":"2026-10-21","start":"10:00","end":"12:00","userId":"ana","joinPolicy":"Open"}'
+  -H "Authorization: Bearer <the accessToken>" \
+  -d '{"roomId":1,"date":"2026-10-27","start":"10:00","end":"12:00","joinPolicy":"Open"}'
 ```
 
-Bookings must start in the next 7 days, so change the date to one that fits. The data lives in a SQLite database, the file `src/StudyRooms.Api/study-rooms.db`. The API creates it on the first run and fills in the sample rooms and users, and it keeps your bookings when you stop and start the API again. To start over, stop the API and delete the file.
+Bookings must start in the next 7 days, so change the date to one that fits. An access token lasts one hour. After that, send the `refreshToken` from the same answer to `/account/refresh` for a new one, or log in again. In Scalar, paste the access token in the Bearer field at the top of the page.
+
+If you still have the database from week 5, you can keep it. Its users have no passwords, so the first run removes them and their bookings, then adds the sample accounts. The rooms stay.
 
 ## Changing the database
 
