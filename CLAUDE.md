@@ -23,7 +23,7 @@ git tag week-03 && git push origin week-03
 
 ## Frontend
 
-`frontend/` is a React app made with Vite, deployed to GitHub Pages. It is the interface that shows the API at work, and it is not taught: students do not read its code and the lab does not explain it. The rules in the Code section above are for the API and do not limit the frontend. It has to look good, work on a phone, a laptop and a projector, and run with Node and `npm` alone. Product context for it is in `PRODUCT.md`.
+`frontend/` is a React app made with Vite. It is published to GitHub Pages from week 11, once the API is online; until then it runs locally with `npm run dev`. It is the interface that shows the API at work, and it is not taught: students do not read its code and the lab does not explain it. The rules in the Code section above are for the API and do not limit the frontend. It has to look good, work on a phone, a laptop and a projector, and run with Node and `npm` alone. Product context for it is in `PRODUCT.md`.
 
 ## Writing
 

@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-The backend is an ASP.NET Core API on .NET 10 (controllers, EF Core, SQLite) in `src/StudyRooms.Api`. The frontend is a separate React app made with Vite in `frontend/`, deployed to GitHub Pages at https://razvangolan.github.io/study-rooms/. Its API address comes from `VITE_API_URL`. Login uses bearer tokens kept in `localStorage`, because the frontend and the API are on different sites.
+The backend is an ASP.NET Core API on .NET 10 (controllers, EF Core, SQLite) in `src/StudyRooms.Api`. The frontend is a separate React app made with Vite in `frontend/`. From week 11, once the API is online, it is published to GitHub Pages at https://razvangolan.github.io/study-rooms/; until then it runs locally with `npm run dev`. Its API address comes from `VITE_API_URL`. Login uses bearer tokens kept in `localStorage`, because the frontend and the API are on different sites.
 
 Styling: delegated. The instructor asked for an interface that looks great and is responsive, and left the styling approach to the build. Chosen: TypeScript, plain CSS with custom properties in one stylesheet, the Archivo font self-hosted through `@fontsource-variable/archivo`, icons from `lucide-react`, and no UI or routing library, so the app runs with Node and `npm` alone and builds in the GitHub Pages Action.
 
@@ -40,7 +40,7 @@ The interface is a faithful window onto an API the class designed and wrote them
 - Sign up with email, password and a display name; log in. From week 11, sign in with GitHub or Google, and choose a display name on first sign-in.
 - From week 9, an inbox of notifications (`GET /me/notifications`): confirmations, joins, requests, reminders, cancellations.
 - Classroom showcases: two browser windows (one normal, one private) as two students on the projector; the class on their phones in week 11.
-- Until week 11 the deployed frontend talks to a local API only, so the Pages site is a preview. After week 11 the API runs on an Oracle Cloud VM behind HTTPS.
+- Until week 11 the frontend runs only on each student's computer, next to their own API. In week 11 the API moves to an Oracle Cloud VM behind HTTPS and the frontend goes to GitHub Pages.
 
 ## Capabilities and Constraints
 

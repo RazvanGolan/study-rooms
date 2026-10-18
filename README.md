@@ -24,7 +24,7 @@ To see what changed in one week, compare two tags on GitHub, for example https:/
 | 4 | Request and response models, validation, joining a booking, API documentation |
 | 5 | A SQLite database with EF Core, and what happens when two people book the same room at once |
 | 6 | Accounts with a user and an admin role, and the admin side |
-| 8 | The timetable in the browser, as a separate app on GitHub Pages |
+| 8 | The timetable in the browser, as a separate app |
 | 9 | Reminders and notifications sent in the background |
 | 10 | Notifications as a second service, run together with Aspire, and telemetry |
 | 11 | The application online, with sign-in through GitHub or Google |
