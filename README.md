@@ -46,7 +46,18 @@ curl -X POST http://localhost:5080/bookings -H "Content-Type: application/json" 
   -d '{"roomId":1,"date":"2026-10-21","start":"10:00","end":"12:00","userId":"ana","joinPolicy":"Open"}'
 ```
 
-Bookings must start in the next 7 days, so change the date to one that fits. Everything is kept in memory for now, so stopping the API forgets every booking. The database comes in week 5.
+Bookings must start in the next 7 days, so change the date to one that fits. The data lives in a SQLite database, the file `src/StudyRooms.Api/study-rooms.db`. The API creates it on the first run and fills in the sample rooms and users, and it keeps your bookings when you stop and start the API again. To start over, stop the API and delete the file.
+
+## Changing the database
+
+When you change a class that is stored in the database, add a migration, a small C# file that describes the change. The `dotnet ef` tool writes it for you. The repository lists the tool in `dotnet-tools.json`, so one command installs it for this folder:
+
+```bash
+dotnet tool restore
+dotnet ef migrations add AddRoomFloor --project src/StudyRooms.Api
+```
+
+The next `dotnet run` applies the new migration to `study-rooms.db`.
 
 ## Using it for your project
 

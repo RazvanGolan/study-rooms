@@ -1,4 +1,5 @@
 using StudyRooms.Api.Domain;
+using StudyRooms.Api.Services;
 
 namespace StudyRooms.Api.Models;
 
@@ -17,16 +18,16 @@ public record BookingResponse(
     BookingStatus Status,
     CancelReason? Reason)
 {
-    public static BookingResponse From(Booking booking, Timetable timetable)
+    public static BookingResponse From(Booking booking, BookingService bookingService)
     {
-        Room room = timetable.GetRoom(booking.RoomId);
+        Room room = bookingService.GetRoom(booking.RoomId);
 
         List<string> people = [];
         foreach (Participant participant in booking.Participants)
         {
             if (participant.Status == ParticipantStatus.Joined)
             {
-                people.Add(timetable.GetUser(participant.UserId).DisplayName);
+                people.Add(bookingService.GetUser(participant.UserId).DisplayName);
             }
         }
 
@@ -37,7 +38,7 @@ public record BookingResponse(
             booking.Date,
             booking.Start,
             booking.End,
-            timetable.GetUser(booking.OwnerId).DisplayName,
+            bookingService.GetUser(booking.OwnerId).DisplayName,
             people,
             Math.Max(0, room.Capacity - people.Count),
             booking.JoinPolicy,

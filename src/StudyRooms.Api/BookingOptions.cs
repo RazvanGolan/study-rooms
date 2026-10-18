@@ -11,4 +11,5 @@ public class BookingOptions
     public int DaysAhead { get; set; }
     public int CancelCutoffHours { get; set; }
     public string TimeZone { get; set; } = "";
+    public int DemoDelaySeconds { get; set; }
 }

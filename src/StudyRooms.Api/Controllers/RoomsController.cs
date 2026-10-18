@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StudyRooms.Api.Domain;
 using StudyRooms.Api.Models;
+using StudyRooms.Api.Services;
 
 namespace StudyRooms.Api.Controllers;
 
@@ -8,19 +9,19 @@ namespace StudyRooms.Api.Controllers;
 [Route("rooms")]
 public class RoomsController : ControllerBase
 {
-    private readonly Timetable _timetable;
+    private readonly RoomService _roomService;
 
-    public RoomsController(Timetable timetable)
+    public RoomsController(RoomService roomService)
     {
-        _timetable = timetable;
+        _roomService = roomService;
     }
 
-    // GET /rooms
+    // GET /rooms, or GET /rooms?equipment=Projector,PowerOutlets for the rooms that have both
     [HttpGet]
-    public List<RoomResponse> GetAll()
+    public List<RoomResponse> GetAll(Equipment equipment = Equipment.None)
     {
         List<RoomResponse> rooms = [];
-        foreach (Room room in _timetable.GetRooms())
+        foreach (Room room in _roomService.GetRooms(equipment))
         {
             rooms.Add(RoomResponse.From(room));
         }
@@ -31,7 +32,7 @@ public class RoomsController : ControllerBase
     [HttpGet("{id}")]
     public ActionResult<RoomResponse> Get(int id)
     {
-        Room? room = _timetable.FindRoom(id);
+        Room? room = _roomService.FindRoom(id);
         if (room is null)
         {
             return NotFound();

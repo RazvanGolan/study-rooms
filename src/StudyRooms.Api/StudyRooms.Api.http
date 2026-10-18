@@ -1,12 +1,17 @@
 # Send these one at a time, from top to bottom, while the API runs (dotnet run).
 # Bookings must be within the next 7 days, so set @date to tomorrow first.
 # You can also try every request from the browser at http://localhost:5080/scalar.
+# The database keeps everything between runs. The ids below (bookings/1, 2, 3) are right for a new
+# database, so to start over, stop the API and delete study-rooms.db.
 
 @host = http://localhost:5080
 @date = 2026-10-21
 
 ### All rooms
 GET {{host}}/rooms
+
+### Rooms with a whiteboard and power outlets (only A102)
+GET {{host}}/rooms?equipment=Whiteboard,PowerOutlets
 
 ### Everything wrong at once: 10:10 is not on the 30 minute step, it lasts too long,
 ### it ends after closing time, and there is no user zoe (400 with every problem listed)
@@ -130,3 +135,32 @@ POST {{host}}/bookings/3/cancel
 Content-Type: application/json
 
 { "userId": "ioana" }
+
+### Two requests at once. Set "DemoDelaySeconds": 3 in appsettings.json and restart the API.
+### Then send this request and the next one within 3 seconds of each other.
+### With the transaction, Ioana gets 201 and Radu waits, then gets 409.
+### Without it, both get 201 and B204 is booked twice from 17:00 to 18:00.
+POST {{host}}/bookings
+Content-Type: application/json
+
+{
+  "roomId": 3,
+  "date": "{{date}}",
+  "start": "16:00",
+  "end": "18:00",
+  "userId": "ioana",
+  "joinPolicy": "Open"
+}
+
+### The second one, overlapping the first
+POST {{host}}/bookings
+Content-Type: application/json
+
+{
+  "roomId": 3,
+  "date": "{{date}}",
+  "start": "17:00",
+  "end": "19:00",
+  "userId": "radu",
+  "joinPolicy": "Open"
+}
