@@ -1,6 +1,13 @@
 import { useCallback, useState } from 'react'
 import { AlertTriangle } from 'lucide-react'
-import { ApiError, type Booking, type JoinPolicy } from './api'
+import { ApiError, type Booking, type EquipmentName, type JoinPolicy } from './api'
+
+export const EQUIPMENT_LABEL: Record<EquipmentName, string> = {
+  Projector: 'Projector',
+  Whiteboard: 'Whiteboard',
+  Tv: 'TV',
+  PowerOutlets: 'Power outlets',
+}
 
 export const POLICY_LABEL: Record<JoinPolicy, string> = {
   Private: 'Private',

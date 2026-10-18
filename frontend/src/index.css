@@ -615,6 +615,59 @@ a {
   height: 12px;
 }
 
+/* Filters: which rooms the timetable shows */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 32px;
+  padding: 14px 0 18px;
+  border-top: 1px solid var(--rule);
+}
+
+.filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-label {
+  margin-right: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.filter-group button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1.5px solid var(--ink);
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filter-group button:hover {
+  background: var(--paper-2);
+}
+
+.filter-group button[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.filter-count {
+  margin-left: auto;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
 /* The timetable grid */
 
 .grid-scroll {
@@ -2066,6 +2119,24 @@ a {
   .legend {
     gap: 6px 14px;
     font-size: 12px;
+  }
+
+  .filters {
+    gap: 10px;
+  }
+
+  .filter-label {
+    flex-basis: 100%;
+  }
+
+  .filter-group button {
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+
+  .filter-count {
+    margin-left: 0;
   }
 
   .bar-inner {

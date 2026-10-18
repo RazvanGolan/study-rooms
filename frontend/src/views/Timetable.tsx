@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
-import { api, ApiError, type Booking, type JoinPolicy, type Me, type Room } from '../api'
+import { api, ApiError, EQUIPMENT, type Booking, type EquipmentName, type JoinPolicy, type Me, type Room } from '../api'
 import {
   addDays,
   dayOfMonth,
@@ -19,7 +19,17 @@ import {
   toTime,
   weekday,
 } from '../time'
-import { blockKind, ErrorNote, POLICY_HINT, POLICY_LABEL, Seats, Segmented, Spinner, useAction } from '../ui'
+import {
+  blockKind,
+  EQUIPMENT_LABEL,
+  ErrorNote,
+  POLICY_HINT,
+  POLICY_LABEL,
+  Seats,
+  Segmented,
+  Spinner,
+  useAction,
+} from '../ui'
 import { useSay } from '../toast'
 import { BookingPanel } from './BookingPanel'
 
@@ -50,6 +60,37 @@ const PHONE = 1080
 const ROW = 34
 const MIN_COLUMN = 96
 
+// Which rooms the timetable shows. Kept in this browser, so the timetable opens the way it was left.
+interface Filters {
+  building: string | null
+  equipment: EquipmentName[]
+}
+
+const FILTERS_KEY = 'study-rooms.filters'
+
+function readFilters(): Filters {
+  try {
+    const saved = JSON.parse(localStorage.getItem(FILTERS_KEY) ?? 'null')
+    if (saved && Array.isArray(saved.equipment)) {
+      return {
+        building: typeof saved.building === 'string' ? saved.building : null,
+        equipment: saved.equipment.filter((e: string) => (EQUIPMENT as readonly string[]).includes(e)),
+      }
+    }
+  } catch {
+    // nothing saved, or storage is blocked
+  }
+  return { building: null, equipment: [] }
+}
+
+function saveFilters(filters: Filters) {
+  try {
+    localStorage.setItem(FILTERS_KEY, JSON.stringify(filters))
+  } catch {
+    // the filters then last until the page is reloaded
+  }
+}
+
 function useWindowWidth() {
   const [width, setWidth] = useState(window.innerWidth)
   useEffect(() => {
@@ -74,7 +115,9 @@ export function Timetable({
   onFocusDone: () => void
 }) {
   const [date, setDate] = useState(focus?.date ?? today())
-  const [rooms, setRooms] = useState<Room[] | null>(null)
+  const [allRooms, setAllRooms] = useState<Room[] | null>(null) // every room, for the list of buildings
+  const [rooms, setRooms] = useState<Room[] | null>(null) // the rooms with the equipment asked for
+  const [filters, setFilters] = useState<Filters>(readFilters)
   const [bookings, setBookings] = useState<Booking[] | null>(null)
   const [loadError, setLoadError] = useState<ApiError | Error | null>(null)
   const [selection, setSelection] = useState<Selection | null>(null)
@@ -89,15 +132,20 @@ export function Timetable({
     async (quiet = false) => {
       if (!quiet) setBookings(null)
       try {
-        const [r, b] = await Promise.all([api.rooms(), api.timetable(date)])
-        setRooms(r)
+        const [all, matching, b] = await Promise.all([
+          api.rooms(),
+          filters.equipment.length ? api.rooms(filters.equipment) : null,
+          api.timetable(date),
+        ])
+        setAllRooms(all)
+        setRooms(matching ?? all)
         setBookings(b)
         setLoadError(null)
       } catch (e) {
         if (!quiet) setLoadError(e as Error)
       }
     },
-    [date],
+    [date, filters.equipment],
   )
 
   useEffect(() => {
@@ -244,9 +292,37 @@ export function Timetable({
     return () => cancelAnimationFrame(frame)
   }, [selection])
 
+  // The buildings come from the rooms themselves, so a new building shows up as a choice on its own.
+  const buildings: string[] = []
+  for (const room of allRooms ?? []) {
+    if (!buildings.includes(room.building)) buildings.push(room.building)
+  }
+  buildings.sort()
+  const building = filters.building !== null && buildings.includes(filters.building) ? filters.building : null
+  const shownRooms = rooms?.filter((r) => building === null || r.building === building) ?? null
+  const filtering = building !== null || filters.equipment.length > 0
+
+  function changeFilters(next: Filters) {
+    setFilters(next)
+    saveFilters(next)
+    setFirstRoom(0)
+  }
+
+  function toggleEquipment(item: EquipmentName) {
+    const equipment = filters.equipment.includes(item)
+      ? filters.equipment.filter((e) => e !== item)
+      : [...filters.equipment, item]
+    changeFilters({ ...filters, equipment })
+  }
+
+  // A selection in a room the filters now hide has nothing to point at any more.
+  useEffect(() => {
+    if (selection && shownRooms && !shownRooms.some((r) => r.id === selection.roomId)) setSelection(null)
+  }, [selection, shownRooms])
+
   const days = Array.from({ length: DAYS_AHEAD + 1 }, (_, i) => addDays(todayDate, i))
   const opened = bookings?.find((b) => b.id === openId) ?? null
-  const selectedRoom = rooms?.find((r) => r.id === selection?.roomId) ?? null
+  const selectedRoom = allRooms?.find((r) => r.id === selection?.roomId) ?? null
 
   function blockButton(b: Booking, room: Room, style: CSSProperties, tall: boolean) {
     const kind = blockKind(b)
@@ -304,10 +380,10 @@ export function Timetable({
   }
 
   // The phone layout shows as many room columns as fit; arrows move the view one room at a time.
-  const roomCount = rooms?.length ?? 3
+  const roomCount = shownRooms?.length ?? 3
   const visible = Math.max(1, Math.min(roomCount, Math.floor((width - 32 - 48) / MIN_COLUMN)))
   const first = Math.min(firstRoom, Math.max(0, roomCount - visible))
-  const shown = rooms ? rooms.slice(first, first + visible) : null
+  const shown = shownRooms ? shownRooms.slice(first, first + visible) : null
   const nowVisible = isToday && now >= OPENS && now < CLOSES
 
   function replaceBooking(updated: Booking) {
@@ -383,6 +459,40 @@ export function Timetable({
         </div>
       </section>
 
+      {allRooms && allRooms.length > 0 && (
+        <section className="filters" aria-label="Which rooms to show">
+          {buildings.length > 1 && (
+            <div className="filter-group" role="group" aria-label="Building">
+              <span className="filter-label">Building</span>
+              <button aria-pressed={building === null} onClick={() => changeFilters({ ...filters, building: null })}>
+                All
+              </button>
+              {buildings.map((b) => (
+                <button key={b} aria-pressed={building === b} onClick={() => changeFilters({ ...filters, building: b })}>
+                  {b}
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="filter-group" role="group" aria-label="Equipment">
+            <span className="filter-label">Needs</span>
+            {EQUIPMENT.map((e) => (
+              <button key={e} aria-pressed={filters.equipment.includes(e)} onClick={() => toggleEquipment(e)}>
+                {EQUIPMENT_LABEL[e]}
+              </button>
+            ))}
+          </div>
+          {filtering && shownRooms && (
+            <p className="filter-count">
+              {shownRooms.length} of {allRooms.length} rooms{' '}
+              <button className="link-btn" onClick={() => changeFilters({ building: null, equipment: [] })}>
+                Show all
+              </button>
+            </p>
+          )}
+        </section>
+      )}
+
       {loadError ? (
         <div className="grid-empty">
           <ErrorNote error={loadError} />
@@ -390,7 +500,22 @@ export function Timetable({
             Try again
           </button>
         </div>
-      ) : rooms && rooms.length === 0 ? (
+      ) : shownRooms && shownRooms.length === 0 && allRooms && allRooms.length > 0 ? (
+        <div className="grid-empty">
+          <h2>No room matches</h2>
+          <p>
+            No room
+            {building !== null ? ` in ${building}` : ''}
+            {filters.equipment.length > 0
+              ? ` has ${filters.equipment.map((e) => EQUIPMENT_LABEL[e].toLowerCase()).join(' and ')}`
+              : ''}
+            .
+          </p>
+          <button className="btn" onClick={() => changeFilters({ building: null, equipment: [] })}>
+            Show all rooms
+          </button>
+        </div>
+      ) : allRooms && allRooms.length === 0 ? (
         <div className="grid-empty">
           <h2>No rooms yet</h2>
           <p>{me.isAdmin ? 'Add the first room on the Admin page.' : 'An admin has not added any rooms yet.'}</p>
@@ -442,11 +567,16 @@ export function Timetable({
 
           <div className="vbody" style={{ height: SLOTS * ROW }}>
             <div className="vtimes" aria-hidden="true">
-              {HOURS.map((h, i) => (
-                <span key={h} style={{ top: i * 2 * ROW }}>
-                  {h}
-                </span>
-              ))}
+              {HOURS.map((h, i) => {
+                // The now tag sits in this gutter too. The numeral it would cover gives way to it.
+                const hour = OPENS + i * 60
+                const covered = nowVisible && now > hour - 5 && now < hour + 33
+                return (
+                  <span key={h} style={{ top: i * 2 * ROW, visibility: covered ? 'hidden' : undefined }}>
+                    {h}
+                  </span>
+                )
+              })}
             </div>
             <div className="vcols" style={{ gridTemplateColumns: `repeat(${visible}, 1fr)` }}>
               {shown?.map((room) => (
@@ -484,7 +614,7 @@ export function Timetable({
             </div>
 
             <div className="lanes">
-            {(rooms ?? [null, null, null]).map((room, i) =>
+            {(shownRooms ?? [null, null, null]).map((room, i) =>
               room === null ? (
                 <div className="grid-row" key={i}>
                   <div className="plate" />
@@ -538,7 +668,7 @@ export function Timetable({
         </div>
       )}
 
-      {rooms && rooms.length > 0 && !loadError && (
+      {shownRooms && shownRooms.length > 0 && !loadError && (
         <p className="grid-note">
           {isPastDay
             ? 'This day is over. You can look, but not book.'
@@ -571,7 +701,7 @@ export function Timetable({
         <BookingPanel
           me={me}
           booking={opened}
-          room={rooms?.find((r) => r.id === opened.roomId) ?? null}
+          room={allRooms?.find((r) => r.id === opened.roomId) ?? null}
           onClose={() => setOpenId(null)}
           onChanged={(b) => {
             replaceBooking(b)

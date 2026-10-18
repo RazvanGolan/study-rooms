@@ -294,6 +294,10 @@ Square, ruled and blunt. Every button is 44px tall with 0 18px padding, weight 6
 ### Segmented control
 A 2px ink frame with 1.5px dividers and 40px options; the checked option fills with ink. Inside the booking bar the colors invert through two local variables so the same control reads on ink. Used for the join policy and list filters.
 
+### Filter row
+
+Between the day header and the timetable, above a 1px rule: Building (All plus one button per building, one choice, shown only when there are two or more buildings) and Needs (one toggle per piece of equipment, any number). The buttons are square 34px toggles with a 1.5px ink border; a pressed one is filled with ink. Labels are 12px uppercase muted. When a filter is on, "N of M rooms" and a Show all link sit at the right. The choice is kept in the browser.
+
 ### Inputs / Fields
 A shaded paper well with a 2px ink bottom border and square corners, 44px tall. Focus turns the bottom border red and doubles it with a 1px inset red line; there is no glow. The caret is red. Labels sit above in 13px uppercase. In the booking bar inputs and selects go transparent with a paper colored bottom border.
 

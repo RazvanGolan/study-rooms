@@ -233,7 +233,9 @@ export async function register(email: string, password: string, displayName: str
 export const api = {
   me: () => request<Me>('GET', '/me'),
   myBookings: () => request<Booking[]>('GET', '/me/bookings'),
-  rooms: () => request<Room[]>('GET', '/rooms'),
+  // With equipment, only the rooms that have all of it: GET /rooms?equipment=Projector,Whiteboard
+  rooms: (equipment: EquipmentName[] = []) =>
+    request<Room[]>('GET', equipment.length ? `/rooms?equipment=${encodeURIComponent(equipment.join(','))}` : '/rooms'),
   timetable: (date: string) => request<Booking[]>('GET', `/timetable?date=${date}`),
   booking: (id: number) => request<Booking>('GET', `/bookings/${id}`),
   book: (roomId: number, date: string, start: string, end: string, joinPolicy: JoinPolicy) =>

@@ -2,16 +2,9 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { api, EQUIPMENT, type AdminBooking, type CancelReason, type EquipmentName, type Room } from '../api'
 import { addDays, dayOfMonth, longDate, shortTime, today, weekday } from '../time'
-import { ErrorNote, POLICY_LABEL, Segmented, Spinner, useAction } from '../ui'
+import { EQUIPMENT_LABEL, ErrorNote, POLICY_LABEL, Segmented, Spinner, useAction } from '../ui'
 import { useSay } from '../toast'
 import { equipmentList } from './Timetable'
-
-const EQUIPMENT_LABEL: Record<EquipmentName, string> = {
-  Projector: 'Projector',
-  Whiteboard: 'Whiteboard',
-  Tv: 'TV',
-  PowerOutlets: 'Power outlets',
-}
 
 const REASON: Record<CancelReason, string> = {
   ByOwner: 'by the owner',
