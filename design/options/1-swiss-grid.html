@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f4f4f2;--ink:#141414;--red:#e2231a;--mute:#5f5f5b;--rule:#d9d9d5}
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:var(--paper);color:var(--ink);font-family:Archivo,sans-serif;font-variant-numeric:tabular-nums}
+header{height:64px;display:flex;align-items:center;gap:32px;padding:0 40px;border-bottom:2px solid var(--ink)}
+.brand{font-weight:800;font-size:20px;letter-spacing:-.01em}
+nav{display:flex;gap:24px;font-size:15px;font-weight:500}
+nav a{color:var(--ink);text-decoration:none;padding:21px 0;border-bottom:3px solid transparent}
+nav a.on{border-color:var(--red)}
+.me{margin-left:auto;font-size:14px;color:var(--mute)}
+.day{display:flex;align-items:flex-end;gap:28px;padding:28px 40px 20px}
+.day h1{font-size:88px;line-height:.85;font-weight:800;font-stretch:80%;letter-spacing:-.03em}
+.day .sub{font-size:18px;font-weight:500;padding-bottom:6px}
+.steps{display:flex;gap:6px;padding-bottom:6px}
+.steps span{font-size:14px;font-weight:600;padding:8px 12px;border:1.5px solid var(--ink)}
+.steps span.on{background:var(--ink);color:var(--paper)}
+.legend{margin-left:auto;display:flex;gap:20px;font-size:13px;padding-bottom:8px}
+.legend i{display:inline-block;width:22px;height:12px;vertical-align:-1px;margin-right:6px}
+.grid{position:relative;margin:0 40px;display:grid;grid-template-columns:220px repeat(24,1fr)}
+.hours{display:contents}
+.h{grid-column:span 2;font-size:44px;font-weight:800;font-stretch:75%;letter-spacing:-.02em;line-height:1;padding:6px 0 10px 4px;border-left:2px solid var(--ink)}
+.corner{border-bottom:2px solid var(--ink)}
+.hrow{display:contents}
+.h{border-bottom:2px solid var(--ink)}
+.room{padding:14px 12px 14px 0;border-bottom:1px solid var(--rule);height:104px}
+.room b{display:block;font-size:26px;font-weight:800;letter-spacing:-.01em}
+.room small{display:block;font-size:13px;color:#4a4a47;margin-top:2px}
+.room em{font-style:normal;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);margin-top:6px;display:block}
+.cell{border-bottom:1px solid var(--rule);border-left:1px solid var(--rule);height:104px}
+.cell.hr{border-left:2px solid #bdbdb8}
+.blk{position:absolute;height:84px;padding:10px 12px;font-size:14px;line-height:1.25;overflow:hidden}
+.blk b{display:block;font-size:16px;font-weight:700}
+.blk .seats{position:absolute;left:12px;bottom:10px;display:flex;gap:4px}
+.blk .seats i{width:9px;height:9px;border-radius:50%;border:1.5px solid currentColor}
+.blk .seats i.f{background:currentColor}
+.open{background:var(--ink);color:var(--paper)}
+.req{background:var(--paper);border:2.5px solid var(--ink)}
+.priv{background:#bdbdb8;color:var(--ink)}
+.mine{background:var(--red);color:#fff}
+.class{background:repeating-linear-gradient(-45deg,var(--ink) 0 2px,transparent 2px 8px);border:2px solid var(--ink)}
+.class b{background:var(--paper);display:inline-block;padding:2px 6px}
+.sel{background:rgba(226,35,26,.12);border:2.5px dashed var(--red);color:var(--red)}
+.now{position:absolute;top:0;bottom:0;width:3px;background:var(--red)}
+.now span{position:absolute;top:-2px;left:6px;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:2px 6px}
+.bar{position:absolute;left:0;right:0;bottom:0;height:76px;background:var(--ink);color:var(--paper);display:flex;align-items:center;gap:28px;padding:0 40px}
+.bar .t{font-size:36px;font-weight:800;font-stretch:80%;letter-spacing:-.02em}
+.bar .d{font-size:15px;opacity:.75}
+.bar .pol{display:flex;gap:0;margin-left:auto}
+.bar .pol span{border:1.5px solid var(--paper);padding:10px 16px;font-size:14px;font-weight:600}
+.bar .pol span.on{background:var(--paper);color:var(--ink)}
+.bar button{background:var(--red);color:#fff;border:0;font:700 16px Archivo;padding:16px 28px}
+</style></head><body>
+<header><div class="brand">Study Rooms</div>
+<nav><a class="on">Timetable</a><a>My bookings</a><a>Admin</a></nav>
+<div class="me">Ana P. · Log out</div></header>
+<section class="day"><h1>Tue 20</h1><div class="sub">October 2026</div>
+<div class="steps"><span>Mon 19</span><span class="on">Tue 20</span><span>Wed 21</span><span>Thu 22</span><span>Fri 23</span><span>Sat 24</span><span>Sun 25</span></div>
+<div class="legend"><span><i class="open"></i>Open</span><span><i class="req" style="border-width:2px"></i>On request</span><span><i class="priv"></i>Private</span><span><i class="mine"></i>Yours</span><span><i class="class"></i>Class</span></div></section>
+<div class="grid">
+<div class="corner"></div>
+<div class="h">08</div><div class="h">09</div><div class="h">10</div><div class="h">11</div><div class="h">12</div><div class="h">13</div><div class="h">14</div><div class="h">15</div><div class="h">16</div><div class="h">17</div><div class="h">18</div><div class="h">19</div>
+<div class="room"><b>A101</b><small>Library</small><em>3 places · Whiteboard</em></div>
+<div class="cell"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div>
+<div class="room"><b>A102</b><small>Library</small><em>6 places · Whiteboard · Outlets</em></div>
+<div class="cell"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div>
+<div class="room"><b>B204</b><small>Electrical Engineering</small><em>10 places · Projector · TV · Outlets</em></div>
+<div class="cell"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div>
+<div class="room"><b>B210</b><small>Electrical Engineering</small><em>8 places · Projector</em></div>
+<div class="cell"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div><div class="cell hr"></div><div class="cell"></div>
+<div class="blk open" style="left:calc(220px + (100% - 220px)/24*4);width:calc((100% - 220px)/24*4 - 4px);top:76px"><b>Ioana D.</b>10:00 to 12:00<div class="seats"><i class="f"></i><i class="f"></i><i></i></div></div>
+<div class="blk mine" style="left:calc(220px + (100% - 220px)/24*12);width:calc((100% - 220px)/24*3 - 4px);top:76px"><b>You</b>14:00 to 15:30<div class="seats"><i class="f"></i><i></i><i></i></div></div>
+<div class="blk req" style="left:calc(220px + (100% - 220px)/24*5);width:calc((100% - 220px)/24*6 - 4px);top:180px"><b>Mihai I.</b>10:30 to 13:30 · asks first<div class="seats"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><i></i></div></div>
+<div class="blk priv" style="left:calc(220px + (100% - 220px)/24*16);width:calc((100% - 220px)/24*2 - 4px);top:180px"><b>Private</b>16:00 to 17:00</div>
+<div class="blk class" style="left:calc(220px + (100% - 220px)/24*0);width:calc((100% - 220px)/24*6 - 4px);top:284px"><b>Class: PCLP</b></div>
+<div class="blk open" style="left:calc(220px + (100% - 220px)/24*14);width:calc((100% - 220px)/24*4 - 4px);top:284px"><b>Radu S.</b>15:00 to 17:00<div class="seats"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+<div class="blk sel" style="left:calc(220px + (100% - 220px)/24*8);width:calc((100% - 220px)/24*4 - 4px);top:388px"><b>New booking</b>12:00 to 14:00</div>
+<div class="now" style="left:calc(220px + (100% - 220px)/24*5.4)"><span>10:42</span></div>
+</div>
+<div class="bar"><div class="t">B210 · 12:00 to 14:00</div><div class="d">2 hours · up to 8 people</div>
+<div class="pol"><span>Private</span><span class="on">Open</span><span>On request</span></div><button>Book room</button></div>
+</body></html>

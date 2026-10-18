@@ -53,6 +53,18 @@ The data lives in a SQLite database, the file `src/StudyRooms.Api/study-rooms.db
 
 It keeps your bookings when you stop and start the API again. To start over, stop the API and delete the file.
 
+## The interface
+
+The folder `frontend/` has a web page for the API: the timetable, your bookings and the admin pages. It needs [Node.js](https://nodejs.org/) 20 or newer. With the API running, in a second terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Then open http://localhost:5173 and pick one of the sample accounts. [frontend/README.md](frontend/README.md) has more.
+
 ## Logging in
 
 Every request needs a token, except signing up and logging in. Log in first:

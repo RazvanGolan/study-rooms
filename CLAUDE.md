@@ -21,6 +21,10 @@ git tag week-03 && git push origin week-03
 - Write the code the way it is shown in class: plain, with few abstractions, no `#region` markers. A student who missed a week should be able to read the diff between two tags.
 - Never put a solution to a graded assignment or a test here. Those are shared with other lab groups and reused from year to year.
 
+## Frontend
+
+`frontend/` is a React app made with Vite, deployed to GitHub Pages. It is the interface that shows the API at work, and it is not taught: students do not read its code and the lab does not explain it. The rules in the Code section above are for the API and do not limit the frontend. It has to look good, work on a phone, a laptop and a projector, and run with Node and `npm` alone. Product context for it is in `PRODUCT.md`.
+
 ## Writing
 
 Students read the README and `REQUIREMENTS.md`, so follow the writing rules from `cflp-lab`: no em or en dashes in prose, state points directly, no bold labels in lists, plain verbs, everything in English.

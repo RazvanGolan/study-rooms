@@ -19,3 +19,6 @@ obj/
 scratch/
 
 .DS_Store
+
+# Working files of the design tool (the options shown in class are in design/options)
+.impeccable/

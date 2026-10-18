@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#fbfbf8;--ink:#1d2330;--y:#ffe14d;--p:#ff7ab6;--g:#7be3a6;--rule:#cfd3da}
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:#e9ebef;font-family:"Atkinson Hyperlegible",sans-serif;color:var(--ink)}
+header{height:60px;background:var(--ink);color:#fff;display:flex;align-items:center;gap:28px;padding:0 36px}
+header b{font-size:19px}header a{font-size:15px;opacity:.8}header a.on{opacity:1;box-shadow:inset 0 -3px var(--y);padding:19px 0}
+header .me{margin-left:auto;font-size:14px;opacity:.7}
+.sheet{position:absolute;left:36px;right:36px;top:88px;bottom:28px;background:var(--paper);box-shadow:0 1px 0 #d4d7dd,0 8px 24px rgba(29,35,48,.08);padding:28px 32px}
+.top{display:flex;align-items:baseline;gap:20px;border-bottom:2px solid var(--ink);padding-bottom:12px}
+.top h1{font-size:30px}.top .d{font-size:16px}
+.top .days{margin-left:auto;display:flex;gap:4px}.top .days span{padding:6px 10px;font-size:14px;border:1px solid var(--rule)}
+.top .days span.on{background:var(--ink);color:#fff}
+table{width:100%;border-collapse:collapse;margin-top:8px;table-layout:fixed}
+th{font-size:13px;text-align:left;padding:8px 0 8px 4px;border-left:1px solid var(--rule);font-weight:700}
+td{border:1px solid var(--rule);height:110px;position:relative}
+td.r{width:200px;border-left:0;padding:10px 12px 10px 0;vertical-align:top}
+td.r b{font-size:22px;display:block}td.r small{font-size:13px;color:#59606e}
+.st{position:absolute;top:24px;height:62px;border-radius:3px 10px 4px 12px/8px 4px 10px 3px;mix-blend-mode:multiply;padding:8px 10px;font-size:14px;line-height:1.2}
+.st b{display:block}
+.y{background:var(--y)}.p{background:var(--p)}.g{background:var(--g)}
+.note{font-family:Caveat,cursive;font-size:22px;color:#2340a8;position:absolute}
+.legend{position:absolute;right:32px;bottom:22px;display:flex;gap:18px;font-size:14px}
+.legend i{display:inline-block;width:26px;height:12px;margin-right:6px;vertical-align:-1px;border-radius:3px 8px 3px 8px}
+</style></head><body>
+<header><b>Study Rooms</b><a class="on">Timetable</a><a>My bookings</a><a>Admin</a><span class="me">Ana P.</span></header>
+<div class="sheet">
+<div class="top"><h1>Tuesday 20 October</h1><span class="d">Study rooms timetable, 8:00 to 20:00</span>
+<div class="days"><span>Mon</span><span class="on">Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div></div>
+<table>
+<tr><th style="width:200px;border:0"></th><th colspan="2">8</th><th colspan="2">9</th><th colspan="2">10</th><th colspan="2">11</th><th colspan="2">12</th><th colspan="2">13</th><th colspan="2">14</th><th colspan="2">15</th><th colspan="2">16</th><th colspan="2">17</th><th colspan="2">18</th><th colspan="2">19</th></tr>
+<tr><td class="r"><b>A101</b><small>Library · 3 places</small></td><td colspan="24"></td></tr>
+<tr><td class="r"><b>A102</b><small>Library · 6 places</small></td><td colspan="24"></td></tr>
+<tr><td class="r"><b>B204</b><small>Electrical Eng. · 10 places</small></td><td colspan="24"></td></tr>
+<tr><td class="r"><b>B210</b><small>Electrical Eng. · 8 places</small></td><td colspan="24"></td></tr>
+<tr><td class="r"><b>B211</b><small>Electrical Eng. · 4 places</small></td><td colspan="24"></td></tr>
+</table>
+<div class="st y" style="left:420px;width:200px;top:130px"><b>Ioana D.</b>10:00 to 12:00 · 1 place left</div>
+<div class="st g" style="left:940px;width:150px;top:130px"><b>You</b>14:00 to 15:30</div>
+<div class="st p" style="left:520px;width:300px;top:240px"><b>Mihai I.</b>10:30 to 13:30 · ask to join</div>
+<div class="st y" style="left:1040px;width:200px;top:350px"><b>Radu S.</b>15:00 to 17:00 · 6 left</div>
+<div class="st" style="left:232px;width:300px;top:350px;background:repeating-linear-gradient(-45deg,#9aa1ad 0 2px,transparent 2px 9px)"><b>Class: PCLP</b></div>
+<div class="note" style="left:720px;top:440px">drag here to book →</div>
+<div class="legend"><span><i class="y"></i>Open</span><span><i class="p"></i>On request</span><span><i class="g"></i>Yours</span></div>
+</div>
+</body></html>

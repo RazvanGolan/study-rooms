@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--y:#ffd200;--k:#111;--w:#fff;--g:#2b2b2b}
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:#f2f2f0;font-family:"Hanken Grotesk",sans-serif;color:var(--k);font-variant-numeric:tabular-nums}
+.band{background:var(--y);height:170px;display:flex;align-items:center;gap:40px;padding:0 48px}
+.pict{width:96px;height:96px;background:var(--k);color:var(--y);display:grid;place-items:center;font-size:56px;font-weight:800}
+.band .msg{font-size:28px;font-weight:600;line-height:1.2}
+.band .msg b{display:block;font-size:64px;font-weight:800;letter-spacing:-.02em}
+.band .arrow{margin-left:auto;font-size:88px;font-weight:800}
+nav{background:var(--k);color:var(--w);height:52px;display:flex;gap:28px;align-items:center;padding:0 48px;font-size:16px;font-weight:600}
+nav span.on{color:var(--y)}nav .me{margin-left:auto;opacity:.6;font-weight:400}
+.grid{margin:24px 48px;display:grid;grid-template-columns:200px repeat(24,1fr);position:relative}
+.h{grid-column:span 2;font-size:22px;font-weight:800;padding:4px 0 8px 4px;border-left:2px solid var(--k)}
+.r{height:112px;border-top:1px solid #c9c9c4;padding:12px 0}
+.r b{font-size:44px;font-weight:800;line-height:1}.r small{display:block;font-size:14px;color:#555}
+.c{border-top:1px solid #c9c9c4;border-left:1px solid #e0e0dc;height:112px}
+.b{position:absolute;height:88px;padding:10px 12px;font-size:15px;font-weight:600}
+.b b{display:block;font-size:17px}
+.free{background:var(--y);color:var(--k);outline:3px solid var(--k);outline-offset:-3px}
+.busy{background:var(--g);color:var(--w)}
+.now{position:absolute;top:0;bottom:0;width:3px;background:var(--k)}
+</style></head><body>
+<div class="band"><div class="pict">B</div><div class="msg">Next free room<b>B210 · free until 14:00</b>Electrical Engineering, 8 places, projector</div><div class="arrow">→</div></div>
+<nav><span>Study Rooms</span><span class="on">Timetable · Tue 20 Oct</span><span>My bookings</span><span>Admin</span><span class="me">Ana P.</span></nav>
+<div class="grid">
+<div></div><div class="h">08</div><div class="h">09</div><div class="h">10</div><div class="h">11</div><div class="h">12</div><div class="h">13</div><div class="h">14</div><div class="h">15</div><div class="h">16</div><div class="h">17</div><div class="h">18</div><div class="h">19</div>
+<div class="r"><b>A101</b><small>Library · 3</small></div><div class="c" style="grid-column:span 24"></div>
+<div class="r"><b>A102</b><small>Library · 6</small></div><div class="c" style="grid-column:span 24"></div>
+<div class="r"><b>B204</b><small>Electrical Eng. · 10</small></div><div class="c" style="grid-column:span 24"></div>
+<div class="r"><b>B210</b><small>Electrical Eng. · 8</small></div><div class="c" style="grid-column:span 24"></div>
+<div class="b busy" style="left:calc(200px + (100% - 200px)/24*4);width:calc((100% - 200px)/24*4);top:52px"><b>Ioana D.</b>10:00 to 12:00</div>
+<div class="b busy" style="left:calc(200px + (100% - 200px)/24*5);width:calc((100% - 200px)/24*6);top:164px"><b>Mihai I.</b>10:30 to 13:30</div>
+<div class="b busy" style="left:calc(200px + (100% - 200px)/24*14);width:calc((100% - 200px)/24*4);top:276px"><b>Radu S.</b>15:00 to 17:00</div>
+<div class="b free" style="left:calc(200px + (100% - 200px)/24*6);width:calc((100% - 200px)/24*6);top:388px"><b>Free</b>11:00 to 14:00</div>
+<div class="now" style="left:calc(200px + (100% - 200px)/24*5.4)"></div>
+</div>
+</body></html>
