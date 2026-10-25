@@ -1,0 +1,5 @@
+# Caddy gets a certificate for API_HOST from Let's Encrypt, answers on HTTPS,
+# and passes every request on to the API container, which listens on port 8080.
+{$API_HOST} {
+	reverse_proxy api:8080
+}

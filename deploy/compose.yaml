@@ -1,0 +1,34 @@
+# What runs on the server: the API, and Caddy in front of it for HTTPS.
+# On the server, next to this file, a .env file names the address: API_HOST=study-rooms-upt.duckdns.org
+# Start or update everything with: docker compose pull && docker compose up -d
+#
+# The API image needs no Dockerfile. The .NET SDK builds it, for the ARM processor of the server:
+#   dotnet publish src/StudyRooms.Api -t:PublishContainer --os linux --arch arm64
+
+services:
+  api:
+    image: ghcr.io/razvangolan/study-rooms-api:latest
+    restart: unless-stopped
+    environment:
+      # The image runs as the user "app", who can only write in its home folder, so the database lives there.
+      ConnectionStrings__StudyRooms: Data Source=/home/app/study-rooms.db
+    volumes:
+      # The home folder is a volume, so the database survives a new version of the image.
+      # ASP.NET Core keeps its token keys there too, so a new version does not log everyone out.
+      - data:/home/app
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      API_HOST: ${API_HOST}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data    # the HTTPS certificate, so Caddy does not ask for a new one at every start
+
+volumes:
+  data:
+  caddy-data:
