@@ -1,12 +1,12 @@
-# Builds the interface in frontend/ and publishes it to GitHub Pages.
-# It only runs when started by hand (Actions, Run workflow) until week 11, when the API is online.
-# Then: turn on Pages with "GitHub Actions" as its source, set the API_URL variable, and add
-#   push:
-#     branches: [main]
-#     paths: ['frontend/**', '.github/workflows/pages.yml']
+# Builds the interface in frontend/ and publishes it to GitHub Pages, at https://razvangolan.github.io/study-rooms/.
+# It runs on every push to main that changes the interface, and by hand (Actions, Run workflow).
+# The repository variable API_URL says where the API is: https://study-rooms.duckdns.org
 name: Frontend on GitHub Pages
 
 on:
+  push:
+    branches: [main]
+    paths: ['frontend/**', '.github/workflows/pages.yml']
   workflow_dispatch:
 
 permissions:
@@ -32,7 +32,6 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
-      # Until the API is online this stays empty, so the page talks to http://localhost:5080.
       - run: npm run build
         env:
           VITE_API_URL: ${{ vars.API_URL }}

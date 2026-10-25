@@ -4,6 +4,8 @@ A web application for booking study rooms at the faculty. We build it together i
 
 Slides for every session: https://razvangolan.github.io/cflp-lab/
 
+The application runs online at https://razvangolan.github.io/study-rooms/. Make an account there to book a room. It runs the latest code, which is often ahead of the week we are in.
+
 The rules of the application are in [REQUIREMENTS.md](REQUIREMENTS.md). We agreed on them in class in week 2.
 
 ## Following along

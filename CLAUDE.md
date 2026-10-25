@@ -23,7 +23,11 @@ git tag week-03 && git push origin week-03
 
 ## Frontend
 
-`frontend/` is a React app made with Vite. It is published to GitHub Pages from week 11, once the API is online; until then it runs locally with `npm run dev`. It is the interface that shows the API at work, and it is not taught: students do not read its code and the lab does not explain it. The rules in the Code section above are for the API and do not limit the frontend. It has to look good, work on a phone, a laptop and a projector, and run with Node and `npm` alone. Product context for it is in `PRODUCT.md`.
+`frontend/` is a React app made with Vite. `.github/workflows/pages.yml` publishes it to GitHub Pages (https://razvangolan.github.io/study-rooms/) on every push to `main` that changes it; locally it runs with `npm run dev`. It is the interface that shows the API at work, and it is not taught: students do not read its code and the lab does not explain it. The rules in the Code section above are for the API and do not limit the frontend. It has to look good, work on a phone, a laptop and a projector, and run with Node and `npm` alone. Product context for it is in `PRODUCT.md`.
+
+## Online
+
+The API runs at https://study-rooms.duckdns.org, on an Oracle Cloud Always Free ARM VM (user `ubuntu`, files in `~/study-rooms`). `deploy/compose.yaml` runs the API image with Caddy in front of it for HTTPS. `.github/workflows/api.yml` builds the image on every push to `main` that changes the API, pushes it to `ghcr.io/razvangolan/study-rooms-api`, and restarts it on the server over SSH. The production database starts empty: register an account on the site, promote it with `UPDATE Users SET IsAdmin = 1` on the database in the volume, and add the rooms from the admin page.
 
 ## Writing
 
